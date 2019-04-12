@@ -3,7 +3,7 @@ provider "kubernetes" {
 }
 
 provider "aws" {
-  version = "~> 2.3"
+  version = "~> 2.6"
 }
 
 locals {
