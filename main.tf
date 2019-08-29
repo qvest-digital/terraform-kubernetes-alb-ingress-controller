@@ -1,11 +1,3 @@
-provider "kubernetes" {
-  version = "~> 1.5"
-}
-
-provider "aws" {
-  version = "~> 2.6"
-}
-
 locals {
   aws_alb_ingress_controller_version      = "1.1.2"
   aws_alb_ingress_controller_docker_image = "docker.io/amazon/aws-alb-ingress-controller:v${local.aws_alb_ingress_controller_version}"
@@ -15,9 +7,9 @@ locals {
 resource "aws_iam_role" "this" {
   name        = "k8s-${var.k8s_cluster_name}-alb-ingress-controller"
   description = "Permissions required by the Kubernetes AWS ALB Ingress controller to do it's job."
-  path        = "${var.aws_iam_path_prefix}"
+  path        = var.aws_iam_path_prefix
 
-  tags = "${var.aws_tags}"
+  tags = var.aws_tags
 
   force_detach_policies = true
 
@@ -35,12 +27,13 @@ resource "aws_iam_role" "this" {
   ]
 }
 EOF
+
 }
 
 resource "aws_iam_policy" "this" {
   name        = "k8s-${var.k8s_cluster_name}-alb-management"
   description = "Permissions that are required to manage the AWS Application Load Balancer."
-  path        = "${var.aws_iam_path_prefix}"
+  path        = var.aws_iam_path_prefix
 
   policy = <<EOF
 {
@@ -155,21 +148,23 @@ resource "aws_iam_policy" "this" {
   ]
 }
 EOF
+
 }
 
 resource "aws_iam_role_policy_attachment" "this" {
-  policy_arn = "${aws_iam_policy.this.arn}"
-  role       = "${aws_iam_role.this.name}"
+  policy_arn = aws_iam_policy.this.arn
+  role       = aws_iam_role.this.name
 }
 
 resource "kubernetes_service_account" "this" {
+  automount_service_account_token = true
   metadata {
     name      = "aws-alb-ingress-controller"
-    namespace = "${var.k8s_namespace}"
+    namespace = var.k8s_namespace
 
-    labels {
-      "app"      = "aws-alb-ingress-controller"
-      "heritage" = "Terraform"
+    labels = {
+      "app.kubernetes.io/name"       = "aws-alb-ingress-controller"
+      "app.kubernetes.io/managed-by" = "terraform"
     }
   }
 }
@@ -178,9 +173,9 @@ resource "kubernetes_cluster_role" "this" {
   metadata {
     name = "aws-alb-ingress-controller"
 
-    labels {
-      "app"      = "aws-alb-ingress-controller"
-      "heritage" = "Terraform"
+    labels = {
+      "app.kubernetes.io/name"       = "aws-alb-ingress-controller"
+      "app.kubernetes.io/managed-by" = "terraform"
     }
   }
 
@@ -235,42 +230,40 @@ resource "kubernetes_cluster_role_binding" "this" {
   metadata {
     name = "aws-alb-ingress-controller"
 
-    labels {
-      "app"      = "aws-alb-ingress-controller"
-      "heritage" = "Terraform"
+    labels = {
+      "app.kubernetes.io/name"       = "aws-alb-ingress-controller"
+      "app.kubernetes.io/managed-by" = "terraform"
     }
   }
 
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
-    name      = "${kubernetes_cluster_role.this.metadata.0.name}"
+    name      = kubernetes_cluster_role.this.metadata[0].name
   }
 
   subject {
     api_group = ""
     kind      = "ServiceAccount"
-    name      = "${kubernetes_service_account.this.metadata.0.name}"
-    namespace = "${kubernetes_service_account.this.metadata.0.namespace}"
+    name      = kubernetes_service_account.this.metadata[0].name
+    namespace = kubernetes_service_account.this.metadata[0].namespace
   }
 }
 
 resource "kubernetes_deployment" "this" {
-  depends_on = [
-    "kubernetes_cluster_role_binding.this",
-  ]
+  depends_on = [kubernetes_cluster_role_binding.this]
 
   metadata {
     name      = "aws-alb-ingress-controller"
-    namespace = "${var.k8s_namespace}"
+    namespace = var.k8s_namespace
 
-    labels {
-      "app"      = "aws-alb-ingress-controller"
-      "version"  = "${local.aws_alb_ingress_controller_version}"
-      "heritage" = "Terraform"
+    labels = {
+      "app.kubernetes.io/name"       = "aws-alb-ingress-controller"
+      "app.kubernetes.io/version"    = local.aws_alb_ingress_controller_version
+      "app.kubernetes.io/managed-by" = "terraform"
     }
 
-    annotations {
+    annotations = {
       "field.cattle.io/description" = "AWS ALB Ingress Controller"
     }
   }
@@ -279,20 +272,21 @@ resource "kubernetes_deployment" "this" {
     replicas = 1
 
     selector {
-      match_labels {
-        "name" = "aws-alb-ingress-controller"
+      match_labels = {
+        "app.kubernetes.io/name" = "aws-alb-ingress-controller"
       }
     }
 
     template {
       metadata {
-        labels {
-          "name" = "aws-alb-ingress-controller"
+        labels = {
+          "app.kubernetes.io/name"    = "aws-alb-ingress-controller"
+          "app.kubernetes.io/version" = local.aws_alb_ingress_controller_version
         }
 
-        annotations {
+        annotations = {
           # Annotation to be used by KIAM
-          "iam.amazonaws.com/role" = "${aws_iam_role.this.arn}"
+          "iam.amazonaws.com/role" = aws_iam_role.this.arn
         }
       }
 
@@ -302,7 +296,7 @@ resource "kubernetes_deployment" "this" {
 
         container {
           name                     = "server"
-          image                    = "${local.aws_alb_ingress_controller_docker_image}"
+          image                    = local.aws_alb_ingress_controller_docker_image
           image_pull_policy        = "Always"
           termination_message_path = "/dev/termination-log"
 
@@ -316,7 +310,7 @@ resource "kubernetes_deployment" "this" {
 
           volume_mount {
             mount_path = "/var/run/secrets/kubernetes.io/serviceaccount"
-            name       = "${kubernetes_service_account.this.default_secret_name}"
+            name       = kubernetes_service_account.this.default_secret_name
             read_only  = true
           }
 
@@ -351,14 +345,14 @@ resource "kubernetes_deployment" "this" {
         }
 
         volume {
-          name = "${kubernetes_service_account.this.default_secret_name}"
+          name = kubernetes_service_account.this.default_secret_name
 
           secret {
-            secret_name = "${kubernetes_service_account.this.default_secret_name}"
+            secret_name = kubernetes_service_account.this.default_secret_name
           }
         }
 
-        service_account_name             = "${kubernetes_service_account.this.metadata.0.name}"
+        service_account_name             = kubernetes_service_account.this.metadata[0].name
         termination_grace_period_seconds = 60
       }
     }
