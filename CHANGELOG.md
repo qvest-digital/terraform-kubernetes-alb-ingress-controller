@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [3.0.0] - 2020-01-22
 
+## Added
+
+- The type of the Kubernetes cluster can no be specified.
+  Set this to `eks` if targeting a managed [EKS](https://aws.amazon.com/eks/) Cluster.
+- If targeting EKS clusters, pods will use IAM roles for service accounts](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html)
+  as intended by AWS.
+
 ## Updated
 
 - The default version of the controller has been set to [v1.1.5](https://github.com/kubernetes-sigs/aws-alb-ingress-controller/releases/tag/v1.1.5)

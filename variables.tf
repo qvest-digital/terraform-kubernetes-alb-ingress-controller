@@ -1,3 +1,9 @@
+variable "k8s_cluster_type" {
+  description = "Can be set to `vanilla` or `eks`. If set to `eks`, the Kubernetes cluster will be assumed to be run on EKS which will make sure that the AWS IAM Service integration works as supposed to."
+  type        = string
+  default     = "vanilla"
+}
+
 variable "k8s_cluster_name" {
   description = "Name of the Kubernetes cluster. This string is used to contruct the AWS IAM permissions and roles."
   type        = string
@@ -11,14 +17,17 @@ variable "k8s_namespace" {
 variable "aws_iam_path_prefix" {
   description = "Prefix to be used for all AWS IAM objects."
   type        = string
+  default     = ""
 }
 
 variable "aws_vpc_id" {
-  type = string
+  type    = string
+  default = null
 }
 
 variable "aws_region_name" {
-  type = string
+  type    = string
+  default = null
 }
 
 variable "aws_resource_name_prefix" {
