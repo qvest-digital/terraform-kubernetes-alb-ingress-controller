@@ -5,12 +5,13 @@ variable "k8s_cluster_type" {
 }
 
 variable "k8s_cluster_name" {
-  description = "Name of the Kubernetes cluster. This string is used to contruct the AWS IAM permissions and roles."
+  description = "Name of the Kubernetes cluster. This string is used to contruct the AWS IAM permissions and roles. If targeting EKS, the corresponsing managed cluster name must match as well."
   type        = string
 }
 
 variable "k8s_namespace" {
   description = "Kubernetes namespace to deploy the AWS ALB Ingress Controller into."
+  type        = string
   default     = "default"
 }
 
@@ -21,13 +22,15 @@ variable "aws_iam_path_prefix" {
 }
 
 variable "aws_vpc_id" {
-  type    = string
-  default = null
+  description = "ID of the Virtual Private Network to utilize. Can be ommited if targeting EKS."
+  type        = string
+  default     = null
 }
 
 variable "aws_region_name" {
-  type    = string
-  default = null
+  description = "ID of the Virtual Private Network to utilize. Can be ommited if targeting EKS."
+  type        = string
+  default     = null
 }
 
 variable "aws_resource_name_prefix" {
