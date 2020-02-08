@@ -4,6 +4,7 @@ locals {
   aws_alb_ingress_class                   = "alb"
   aws_vpc_id                              = data.aws_vpc.selected.id
   aws_region_name                         = data.aws_region.current.name
+  aws_iam_path_prefix                     = var.aws_iam_path_prefix == "" ? null : var.aws_iam_path_prefix
 }
 
 data "aws_vpc" "selected" {
@@ -58,7 +59,7 @@ data "aws_iam_policy_document" "eks_oidc_assume_role" {
 resource "aws_iam_role" "this" {
   name        = "${var.aws_resource_name_prefix}${var.k8s_cluster_name}-alb-ingress-controller"
   description = "Permissions required by the Kubernetes AWS ALB Ingress controller to do it's job."
-  path        = var.aws_iam_path_prefix
+  path        = local.aws_iam_path_prefix
 
   tags = var.aws_tags
 
@@ -186,7 +187,7 @@ data "aws_iam_policy_document" "alb_management" {
 resource "aws_iam_policy" "this" {
   name        = "${var.aws_resource_name_prefix}${var.k8s_cluster_name}-alb-management"
   description = "Permissions that are required to manage AWS Application Load Balancers."
-  path        = var.aws_iam_path_prefix
+  path        = local.aws_iam_path_prefix
   policy      = data.aws_iam_policy_document.alb_management.json
 }
 
