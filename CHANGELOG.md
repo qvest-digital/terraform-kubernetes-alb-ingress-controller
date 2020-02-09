@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- An unset IAM path prefix no longer leads to errors. [#4](https://github.com/iplabs/terraform-kubernetes-alb-ingress-controller/issues/4)
+- An unset IAM path prefix no longer leads to errors. ([#4](https://github.com/iplabs/terraform-kubernetes-alb-ingress-controller/issues/4))
 
 ## [3.0.1] - 2020-01-22
 
