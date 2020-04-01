@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2020-04-01
+
+### Updated
+
+- Default version of the ALB Ingress Controller has been set to [1.1.6](https://github.com/kubernetes-sigs/aws-alb-ingress-controller/releases/tag/v1.1.6).
+
+### Added
+
+- Support for AWS Shield related annotations has been added. This new feature
+  needs a bunch of new AWS IAM permissions which have been added to the IAM policy
+  used by the ALB Ingress Controller.
+
 ## [3.0.2] - 2020-02-09
 
 ### Fixed

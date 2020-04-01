@@ -48,5 +48,5 @@ variable "aws_tags" {
 variable "aws_alb_ingress_controller_version" {
   description = "The AWS ALB Ingress Controller version to use. See https://github.com/kubernetes-sigs/aws-alb-ingress-controller/releases for available versions"
   type        = string
-  default     = "1.1.5"
+  default     = "1.1.6"
 }

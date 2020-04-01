@@ -182,6 +182,18 @@ data "aws_iam_policy_document" "alb_management" {
 
     resources = ["*"]
   }
+
+  statement {
+    actions = [
+      "shield:DescribeProtection",
+      "shield:GetSubscriptionState",
+      "shield:DeleteProtection",
+      "shield:CreateProtection",
+      "shield:DescribeSubscription",
+      "shield:ListProtections"
+    ]
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_policy" "this" {
