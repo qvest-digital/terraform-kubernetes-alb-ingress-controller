@@ -21,6 +21,14 @@ To deploy the AWS ALB Ingress Controller into an EKS cluster, the following
 snippet might be used.
 
 ```hcl
+
+locals {
+   # Your AWS EKS Cluster ID goes here.
+  "k8s_cluster_name" = "my-k8s-cluster"
+}
+
+data "aws_region" "current" {}
+
 module "alb_ingress_controller" {
   source  = "iplabs/alb-ingress-controller/kubernetes"
   version = "3.1.0"
@@ -28,8 +36,7 @@ module "alb_ingress_controller" {
   k8s_cluster_type = "eks"
   k8s_namespace    = "kube-system"
 
-  aws_region_name  = "us-east-1"
-  aws_vpc_id       = var.aws_vpc_id       # Your VPC ID goes here.
-  k8s_cluster_name = var.k8s_cluster_name # Your AWS EKS Cluster ID goes here.
+  aws_region_name  = data.aws_region.current.name
+  k8s_cluster_name = local.k8s_cluster_name
 }
 ```
