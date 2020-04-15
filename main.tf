@@ -333,6 +333,10 @@ resource "kubernetes_deployment" "this" {
       }
     }
 
+    strategy {
+      type = "Recreate"
+    }
+
     template {
       metadata {
         labels = {
