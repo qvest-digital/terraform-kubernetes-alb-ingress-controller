@@ -15,6 +15,12 @@ variable "k8s_namespace" {
   default     = "default"
 }
 
+variable "k8s_replicas" {
+  description = "Amount of replicas to be created."
+  type        = number
+  default     = 1
+}
+
 variable "aws_iam_path_prefix" {
   description = "Prefix to be used for all AWS IAM objects."
   type        = string

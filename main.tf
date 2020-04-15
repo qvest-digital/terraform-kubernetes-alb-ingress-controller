@@ -325,7 +325,8 @@ resource "kubernetes_deployment" "this" {
   }
 
   spec {
-    replicas = 1
+
+    replicas = var.k8s_replicas
 
     selector {
       match_labels = {
@@ -352,7 +353,28 @@ resource "kubernetes_deployment" "this" {
       }
 
       spec {
-        dns_policy     = "ClusterFirst"
+        affinity {
+          pod_anti_affinity {
+            preferred_during_scheduling_ignored_during_execution {
+              weight = 100
+              pod_affinity_term {
+                label_selector {
+                  match_expressions {
+                    key      = "app.kubernetes.io/name"
+                    operator = "In"
+                    values   = ["aws-alb-ingress-controller"]
+                  }
+                }
+                topology_key = "kubernetes.io/hostname"
+              }
+            }
+          }
+        }
+
+        automount_service_account_token = true
+
+        dns_policy = "ClusterFirst"
+
         restart_policy = "Always"
 
         container {
@@ -368,12 +390,6 @@ resource "kubernetes_deployment" "this" {
             "--aws-region=${local.aws_region_name}",
             "--aws-max-retries=10",
           ]
-
-          volume_mount {
-            mount_path = "/var/run/secrets/kubernetes.io/serviceaccount"
-            name       = kubernetes_service_account.this.default_secret_name
-            read_only  = true
-          }
 
           port {
             name           = "health"
@@ -402,14 +418,6 @@ resource "kubernetes_deployment" "this" {
 
             initial_delay_seconds = 60
             period_seconds        = 60
-          }
-        }
-
-        volume {
-          name = kubernetes_service_account.this.default_secret_name
-
-          secret {
-            secret_name = kubernetes_service_account.this.default_secret_name
           }
         }
 
