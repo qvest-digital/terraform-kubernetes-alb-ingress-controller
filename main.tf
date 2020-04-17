@@ -340,16 +340,22 @@ resource "kubernetes_deployment" "this" {
 
     template {
       metadata {
-        labels = {
-          "app.kubernetes.io/name"    = "aws-alb-ingress-controller"
-          "app.kubernetes.io/version" = local.aws_alb_ingress_controller_version
-        }
-        annotations = {
-          # Annotation which is only used by KIAM and kube2iam.
-          # Should be ignored by your cluster if using IAM roles for service accounts, e.g.
-          # when running on EKS.
-          "iam.amazonaws.com/role" = aws_iam_role.this.arn
-        }
+        labels = merge(
+          {
+            "app.kubernetes.io/name"    = "aws-alb-ingress-controller"
+            "app.kubernetes.io/version" = local.aws_alb_ingress_controller_version
+          },
+          var.k8s_pod_labels
+        )
+        annotations = merge(
+          {
+            # Annotation which is only used by KIAM and kube2iam.
+            # Should be ignored by your cluster if using IAM roles for service accounts, e.g.
+            # when running on EKS.
+            "iam.amazonaws.com/role" = aws_iam_role.this.arn
+          },
+          var.k8s_pod_annotations
+        )
       }
 
       spec {

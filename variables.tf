@@ -21,6 +21,19 @@ variable "k8s_replicas" {
   default     = 1
 }
 
+
+variable "k8s_pod_annotations" {
+  description = "Additional annotations to be added to the Pods."
+  type        = map(string)
+  default     = {}
+}
+
+variable "k8s_pod_labels" {
+  description = "Additional labels to be added to the Pods."
+  type        = map(string)
+  default     = {}
+}
+
 variable "aws_iam_path_prefix" {
   description = "Prefix to be used for all AWS IAM objects."
   type        = string
