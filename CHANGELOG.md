@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.0] - 2020-06-04
+
+### Updated
+
+- Default version of the ALB Ingress Controller has been updated to v1.1.7.
+
+### Changed
+
+- Additional IAM permissions have been specified to allow the ALB ingress controller
+  to manage WAF2 using new wafv2 annotations (introduced in v1.1.7).
+
 ## [3.3.0] - 2020-04-17
 
 ### Added

@@ -185,6 +185,16 @@ data "aws_iam_policy_document" "alb_management" {
 
   statement {
     actions = [
+      "wafv2:GetWebACL",
+      "wafv2:GetWebACLForResource",
+      "wafv2:AssociateWebACL",
+      "wafv2:DisassociateWebACL"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    actions = [
       "shield:DescribeProtection",
       "shield:GetSubscriptionState",
       "shield:DeleteProtection",
