@@ -11,7 +11,7 @@ or it can be used to integrate tightly with AWS-managed [EKS](https://aws.amazon
 
 It is required, that an OpenID connect provider [has already been created](https://www.terraform.io/docs/providers/aws/r/eks_cluster.html#example-iam-role-for-eks-cluster) for your EKS cluster for this feature to work.
 
-Just make sure that you set the variable `k8s_cluster_type` type if running on EKS.
+Just make sure that you set the variable `k8s_cluster_type` to `eks` type if running on EKS.
 
 ## Examples
 
@@ -20,7 +20,7 @@ Just make sure that you set the variable `k8s_cluster_type` type if running on E
 To deploy the AWS ALB Ingress Controller into an EKS cluster, the following
 snippet might be used.
 
-```hclaf
+```hcl
 locals {
    # Your AWS EKS Cluster ID goes here.
   "k8s_cluster_name" = "my-k8s-cluster"
@@ -29,7 +29,7 @@ locals {
 data "aws_region" "current" {}
 
 data "aws_eks_cluster" "target" {
-  name = "local.k8s_cluster_name"
+  name = local.k8s_cluster_name
 }
 
 data "aws_eks_cluster_auth" "aws_iam_authenticator" {
@@ -46,7 +46,7 @@ provider "kubernetes" {
 
 module "alb_ingress_controller" {
   source  = "iplabs/alb-ingress-controller/kubernetes"
-  version = "3.1.0"
+  version = "3.4.0"
 
   providers = {
     kubernetes = "kubernetes.eks"
