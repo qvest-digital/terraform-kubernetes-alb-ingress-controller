@@ -407,6 +407,19 @@ resource "kubernetes_deployment" "this" {
             "--aws-max-retries=10",
           ]
 
+          env  { 
+              name  = "AWS_REGION"
+              value = local.aws_region_name
+            }
+          env  {
+              name  = "AWS_ACCESS_KEY_ID"
+              value = var.aws_access_key
+            }
+          env  {
+              name  = "AWS_SECRET_ACCESS_KEY"
+              value = var.aws_secret_access_key
+            }
+
           port {
             name           = "health"
             container_port = 10254
