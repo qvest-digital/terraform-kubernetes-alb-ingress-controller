@@ -8,3 +8,4 @@
 
 - Daniel Randall &lt;dgrandall@me.com&gt;
 - Samer Shami &lt;gitkraken@shogun.work&gt;
+- Viktor Bushmin &lt;viktor.bushmin@gmail.com&gt;
