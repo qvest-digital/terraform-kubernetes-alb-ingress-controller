@@ -258,6 +258,7 @@ resource "kubernetes_cluster_role" "this" {
       "ingresses",
       "ingresses/status",
       "services",
+      "pods/status",
     ]
 
     verbs = [
