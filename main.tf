@@ -64,7 +64,7 @@ resource "aws_iam_role" "this" {
   tags = var.aws_tags
 
   force_detach_policies = true
-
+  permissions_boundary = var.aws_iam_permissions_boundary_arn
   assume_role_policy = var.k8s_cluster_type == "vanilla" ? data.aws_iam_policy_document.ec2_assume_role[0].json : data.aws_iam_policy_document.eks_oidc_assume_role[0].json
 }
 

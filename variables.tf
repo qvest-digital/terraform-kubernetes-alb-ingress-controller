@@ -40,6 +40,12 @@ variable "aws_iam_path_prefix" {
   default     = ""
 }
 
+variable "aws_iam_permissions_boundary_arn" {
+  description = "Allows a permissions boundary on the IAM role to be set"
+  type        = string
+  default     = ""
+}
+
 variable "aws_vpc_id" {
   description = "ID of the Virtual Private Network to utilize. Can be ommited if targeting EKS."
   type        = string
