@@ -406,7 +406,11 @@ resource "kubernetes_deployment" "this" {
             "--aws-region=${local.aws_region_name}",
             "--aws-max-retries=10",
           ]
-
+          env_from {
+            config_map_ref {
+              name = var.k8s_env_config_map
+            }
+          }
           port {
             name           = "health"
             container_port = 10254

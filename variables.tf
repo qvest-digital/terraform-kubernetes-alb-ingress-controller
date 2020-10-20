@@ -21,6 +21,11 @@ variable "k8s_replicas" {
   default     = 1
 }
 
+variable "k8s_env_config_map" {
+  description = "Configmap reference for custom environment for autoscaling"
+  type = string
+  default = null
+}
 
 variable "k8s_pod_annotations" {
   description = "Additional annotations to be added to the Pods."
