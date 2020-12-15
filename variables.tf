@@ -21,6 +21,11 @@ variable "k8s_replicas" {
   default     = 1
 }
 
+variable "k8s_env_config_map" {
+  description = "Configmap reference for custom environment for autoscaling"
+  type = string
+  default = null
+}
 
 variable "k8s_pod_annotations" {
   description = "Additional annotations to be added to the Pods."
@@ -36,6 +41,12 @@ variable "k8s_pod_labels" {
 
 variable "aws_iam_path_prefix" {
   description = "Prefix to be used for all AWS IAM objects."
+  type        = string
+  default     = ""
+}
+
+variable "aws_iam_permissions_boundary_arn" {
+  description = "Allows a permissions boundary on the IAM role to be set"
   type        = string
   default     = ""
 }
