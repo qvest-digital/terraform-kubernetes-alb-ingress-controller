@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0] - 2021-01-05
+
+### Updated
+
+- Renamed, now uses the AWS Load Balancer Controller (v2, formerly known as the
+  AWS ALB Ingress Controller)
+
+### Added
+
+- Variable `aws_load_balancer_controller_chart_version`
+
+### Removed
+
+- Variable `aws_alb_ingress_controller_version`
+
+
 ## [3.4.0] - 2020-06-04
 
 ### Updated
