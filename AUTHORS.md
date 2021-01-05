@@ -8,3 +8,4 @@
 
 - Daniel Randall &lt;dgrandall@me.com&gt;
 - Samer Shami &lt;gitkraken@shogun.work&gt;
+- Bret Mogilefsky &lt;bmogilefsky+albcontroller@gmail.com&gt;
