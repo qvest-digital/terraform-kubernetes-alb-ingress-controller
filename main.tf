@@ -374,130 +374,55 @@ resource "kubernetes_cluster_role_binding" "this" {
   }
 }
 
-resource "kubernetes_deployment" "this" {
-  depends_on = [kubernetes_cluster_role_binding.this]
+resource "helm_release" "using_iamserviceaccount" {
+  count = var.k8s_cluster_type == "eks" ? 1 : 0
 
-  metadata {
-    name      = "aws-alb-ingress-controller"
-    namespace = var.k8s_namespace
-
-    labels = {
-      "app.kubernetes.io/name"       = "aws-alb-ingress-controller"
-      "app.kubernetes.io/version"    = "v${local.aws_alb_ingress_controller_version}"
-      "app.kubernetes.io/managed-by" = "terraform"
-    }
-
-    annotations = {
-      "field.cattle.io/description" = "AWS ALB Ingress Controller"
-    }
+  name       = "aws-load-balancer-controller"
+  repository = local.alb_controller_helm_repo
+  chart      = local.alb_controller_chart_name
+  version    = local.alb_controller_chart_version
+  namespace  = "kube-system"
+  set {
+    name  = "clusterName"
+    value = var.k8s_cluster_name
   }
-
-  spec {
-
-    replicas = var.k8s_replicas
-
-    selector {
-      match_labels = {
-        "app.kubernetes.io/name" = "aws-alb-ingress-controller"
-      }
-    }
-
-    strategy {
-      type = "Recreate"
-    }
-
-    template {
-      metadata {
-        labels = merge(
-          {
-            "app.kubernetes.io/name"    = "aws-alb-ingress-controller"
-            "app.kubernetes.io/version" = local.aws_alb_ingress_controller_version
-          },
-          var.k8s_pod_labels
-        )
-        annotations = merge(
-          {
-            # Annotation which is only used by KIAM and kube2iam.
-            # Should be ignored by your cluster if using IAM roles for service accounts, e.g.
-            # when running on EKS.
-            "iam.amazonaws.com/role" = aws_iam_role.this.arn
-          },
-          var.k8s_pod_annotations
-        )
-      }
-
-      spec {
-        affinity {
-          pod_anti_affinity {
-            preferred_during_scheduling_ignored_during_execution {
-              weight = 100
-              pod_affinity_term {
-                label_selector {
-                  match_expressions {
-                    key      = "app.kubernetes.io/name"
-                    operator = "In"
-                    values   = ["aws-alb-ingress-controller"]
-                  }
-                }
-                topology_key = "kubernetes.io/hostname"
-              }
-            }
-          }
-        }
-
-        automount_service_account_token = true
-
-        dns_policy = "ClusterFirst"
-
-        restart_policy = "Always"
-
-        container {
-          name                     = "server"
-          image                    = local.aws_alb_ingress_controller_docker_image
-          image_pull_policy        = "Always"
-          termination_message_path = "/dev/termination-log"
-
-          args = [
-            "--ingress-class=${local.aws_alb_ingress_class}",
-            "--cluster-name=${var.k8s_cluster_name}",
-            "--aws-vpc-id=${local.aws_vpc_id}",
-            "--aws-region=${local.aws_region_name}",
-            "--aws-max-retries=10",
-          ]
-
-          port {
-            name           = "health"
-            container_port = 10254
-            protocol       = "TCP"
-          }
-
-          readiness_probe {
-            http_get {
-              path   = "/healthz"
-              port   = "health"
-              scheme = "HTTP"
-            }
-
-            initial_delay_seconds = 30
-            period_seconds        = 60
-            timeout_seconds       = 3
-          }
-
-          liveness_probe {
-            http_get {
-              path   = "/healthz"
-              port   = "health"
-              scheme = "HTTP"
-            }
-
-            initial_delay_seconds = 60
-            period_seconds        = 60
-          }
-        }
-
-        service_account_name             = kubernetes_service_account.this.metadata[0].name
-        termination_grace_period_seconds = 60
-      }
-    }
+  set {
+    name  = "serviceAccount.create"
+    value = "false"
+  }
+  set {
+    name  = "serviceAccount.name"
+    value = "aws-load-balancer-controller"
+  }
+  set {
+    name  = "region"
+    value = local.aws_region_name
+  }
+  set {
+    name  = "vpcId"
+    value = local.aws_vpc_id
   }
 }
+
+resource "helm_release" "not_using_iamserviceaccount" {
+  count = var.k8s_cluster_type == "vanilla" ? 1 : 0
+
+  name       = "aws-load-balancer-controller"
+  repository = local.alb_controller_helm_repo
+  chart      = local.alb_controller_chart_name
+  version    = local.alb_controller_chart_version
+  namespace  = "kube-system"
+  set {
+    name  = "clusterName"
+    value = var.k8s_cluster_name
+  }
+  set {
+    name  = "region"
+    value = local.aws_region_name
+  }
+  set {
+    name  = "vpcId"
+    value = local.aws_vpc_id
+  }
+}
+
