@@ -40,17 +40,27 @@ data "aws_eks_cluster_auth" "aws_iam_authenticator" {
 provider "kubernetes" {
   alias = "eks"
   host                   = data.aws_eks_cluster.target.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.target.certificate_authority[0].data)
   token                  = data.aws_eks_cluster_auth.aws_iam_authenticator.token
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.target.certificate_authority[0].data)
   load_config_file       = false
 }
 
-module "alb_ingress_controller" {
-  source  = "iplabs/alb-ingress-controller/kubernetes"
+provider "helm" {
+  alias = "eks"
+  kubernetes {
+    host                   = data.aws_eks_cluster.target.endpoint
+    token                  = data.aws_eks_cluster_auth.aws_iam_authenticator.token
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.target.certificate_authority[0].data)
+  }
+}
+
+module "alb_controller" {
+  source  = "iplabs/alb-controller/kubernetes"
   version = "3.4.0"
 
   providers = {
-    kubernetes = "kubernetes.eks"
+    kubernetes = "kubernetes.eks",
+    helm       = "helm.eks"
   }
 
   k8s_cluster_type = "eks"
