@@ -1,5 +1,5 @@
 variable "k8s_cluster_type" {
-  description = "Can be set to `vanilla` or `eks`. If set to `eks`, the Kubernetes cluster will be assumed to be run on EKS which will make sure that the AWS IAM Service integration works as supposed to."
+  description = "Can be set to `vanilla` or `eks`. If set to `eks`, the Kubernetes cluster will be assumed to be run on EKS which will make sure that the AWS IAM Service integration works as expected."
   type        = string
   default     = "vanilla"
 }
@@ -16,7 +16,7 @@ variable "k8s_namespace" {
 }
 
 variable "k8s_replicas" {
-  description = "Amount of replicas to be created."
+  description = "Number of replicas to be created."
   type        = number
   default     = 1
 }

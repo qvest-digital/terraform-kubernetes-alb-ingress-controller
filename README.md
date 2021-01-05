@@ -9,7 +9,7 @@ This module can be used to install the ALB Ingress controller into a "vanilla" K
 or it can be used to integrate tightly with AWS-managed [EKS](https://aws.amazon.com/eks/) clusters which allows the deployed pods to
 [use IAM roles for service accounts](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html).
 
-It is required, that an OpenID connect provider [has already been created](https://www.terraform.io/docs/providers/aws/r/eks_cluster.html#example-iam-role-for-eks-cluster) for your EKS cluster for this feature to work.
+It is required that an OpenID connect provider [has already been created](https://www.terraform.io/docs/providers/aws/r/eks_cluster.html#example-iam-role-for-eks-cluster) for your EKS cluster for this feature to work.
 
 Just make sure that you set the variable `k8s_cluster_type` to `eks` type if running on EKS.
 
@@ -17,8 +17,8 @@ Just make sure that you set the variable `k8s_cluster_type` to `eks` type if run
 
 ### EKS deployment
 
-To deploy the AWS ALB Ingress Controller into an EKS cluster, the following
-snippet might be used.
+To deploy the AWS Load Balancer Controller into an EKS cluster, use the following
+snippet as an example.
 
 ```hcl
 locals {
