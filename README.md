@@ -1,11 +1,12 @@
-# Terraform module: AWS ALB Ingress Controller installation
+# Terraform module: AWS Load Balancer Controller installation
 
-This Terraform module can be used to install the [AWS ALB Ingress Controller](https://github.com/kubernetes-sigs/aws-alb-ingress-controller)
+This Terraform module can be used to install the [AWS Load Balancer
+Controller](https://github.com/kubernetes-sigs/aws-load-balancer-controller)
 into a Kubernetes cluster.
 
 ## Improved integration with Amazon Elastic Kubernetes Service (EKS)
 
-This module can be used to install the ALB Ingress controller into a "vanilla" Kubernetes cluster (which is the default)
+This module can be used to install the AWS Load Balancer controller into a "vanilla" Kubernetes cluster (which is the default)
 or it can be used to integrate tightly with AWS-managed [EKS](https://aws.amazon.com/eks/) clusters which allows the deployed pods to
 [use IAM roles for service accounts](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html).
 

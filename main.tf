@@ -1,6 +1,7 @@
 locals {
-  aws_alb_ingress_controller_docker_image = "docker.io/amazon/aws-alb-ingress-controller:v${var.aws_alb_ingress_controller_version}"
-  aws_alb_ingress_controller_version      = var.aws_alb_ingress_controller_version
+  alb_controller_helm_repo    = "https://aws.github.io/eks-charts"
+  alb_controller_chart_name   = "aws-load-balancer-controller"
+  alb_controller_chart_version      = var.aws_load_balancer_controller_chart_version
   aws_alb_ingress_class                   = "alb"
   aws_vpc_id                              = data.aws_vpc.selected.id
   aws_region_name                         = data.aws_region.current.name
@@ -44,7 +45,7 @@ data "aws_iam_policy_document" "eks_oidc_assume_role" {
       test     = "StringEquals"
       variable = "${replace(data.aws_eks_cluster.selected[0].identity[0].oidc[0].issuer, "https://", "")}:sub"
       values = [
-        "system:serviceaccount:${var.k8s_namespace}:aws-alb-ingress-controller"
+        "system:serviceaccount:${var.k8s_namespace}:aws-load-balancer-controller"
       ]
     }
     principals {
@@ -57,8 +58,8 @@ data "aws_iam_policy_document" "eks_oidc_assume_role" {
 }
 
 resource "aws_iam_role" "this" {
-  name        = "${var.aws_resource_name_prefix}${var.k8s_cluster_name}-alb-ingress-controller"
-  description = "Permissions required by the Kubernetes AWS ALB Ingress controller to do it's job."
+  name        = "${var.aws_resource_name_prefix}${var.k8s_cluster_name}-aws-load-balancer-controller"
+  description = "Permissions required by the Kubernetes AWS Load Balancer controller to do its job."
   path        = local.aws_iam_path_prefix
 
   tags = var.aws_tags
@@ -221,7 +222,7 @@ resource "aws_iam_role_policy_attachment" "this" {
 resource "kubernetes_service_account" "this" {
   automount_service_account_token = true
   metadata {
-    name      = "aws-alb-ingress-controller"
+    name      = "aws-load-balancer-controller"
     namespace = var.k8s_namespace
     annotations = {
       # This annotation is only used when running on EKS which can
@@ -229,7 +230,7 @@ resource "kubernetes_service_account" "this" {
       "eks.amazonaws.com/role-arn" = aws_iam_role.this.arn
     }
     labels = {
-      "app.kubernetes.io/name"       = "aws-alb-ingress-controller"
+      "app.kubernetes.io/name"       = "aws-load-balancer-controller"
       "app.kubernetes.io/managed-by" = "terraform"
     }
   }
@@ -237,10 +238,10 @@ resource "kubernetes_service_account" "this" {
 
 resource "kubernetes_cluster_role" "this" {
   metadata {
-    name = "aws-alb-ingress-controller"
+    name = "aws-load-balancer-controller"
 
     labels = {
-      "app.kubernetes.io/name"       = "aws-alb-ingress-controller"
+      "app.kubernetes.io/name"       = "aws-load-balancer-controller"
       "app.kubernetes.io/managed-by" = "terraform"
     }
   }
@@ -294,10 +295,10 @@ resource "kubernetes_cluster_role" "this" {
 
 resource "kubernetes_cluster_role_binding" "this" {
   metadata {
-    name = "aws-alb-ingress-controller"
+    name = "aws-load-balancer-controller"
 
     labels = {
-      "app.kubernetes.io/name"       = "aws-alb-ingress-controller"
+      "app.kubernetes.io/name"       = "aws-load-balancer-controller"
       "app.kubernetes.io/managed-by" = "terraform"
     }
   }

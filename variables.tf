@@ -10,7 +10,7 @@ variable "k8s_cluster_name" {
 }
 
 variable "k8s_namespace" {
-  description = "Kubernetes namespace to deploy the AWS ALB Ingress Controller into."
+  description = "Kubernetes namespace to deploy the AWS Load Balancer Controller into."
   type        = string
   default     = "default"
 }
@@ -64,8 +64,8 @@ variable "aws_tags" {
   default     = {}
 }
 
-variable "aws_alb_ingress_controller_version" {
-  description = "The AWS ALB Ingress Controller version to use. See https://github.com/kubernetes-sigs/aws-alb-ingress-controller/releases for available versions"
+variable "aws_load_balancer_controller_chart_version" {
+  description = "The AWS Load Balancer Controller version to use. See https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases for available versions"
   type        = string
-  default     = "1.1.7"
+  default     = "1.1.1"
 }
