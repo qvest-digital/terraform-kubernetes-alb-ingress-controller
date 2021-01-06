@@ -382,6 +382,8 @@ resource "helm_release" "using_iamserviceaccount" {
   chart      = local.alb_controller_chart_name
   version    = local.alb_controller_chart_version
   namespace  = "kube-system"
+  atomic     = true
+
   set {
     name  = "clusterName"
     value = var.k8s_cluster_name
@@ -412,6 +414,8 @@ resource "helm_release" "not_using_iamserviceaccount" {
   chart      = local.alb_controller_chart_name
   version    = local.alb_controller_chart_version
   namespace  = "kube-system"
+  atomic     = true
+
   set {
     name  = "clusterName"
     value = var.k8s_cluster_name
