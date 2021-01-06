@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Variable `aws_load_balancer_controller_chart_version`
+- Variable `alb_controller_depends_on`
 
 ### Removed
 

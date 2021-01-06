@@ -69,3 +69,7 @@ variable "aws_load_balancer_controller_chart_version" {
   type        = string
   default     = "1.1.1"
 }
+
+variable "alb_controller_depends_on" {
+  description = "Resources that the module should wait for before starting the controller. For example if there is no node_group, 'aws_eks_fargate_profile.default'"
+}

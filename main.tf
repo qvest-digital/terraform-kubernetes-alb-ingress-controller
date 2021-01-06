@@ -405,6 +405,8 @@ resource "helm_release" "using_iamserviceaccount" {
     name  = "vpcId"
     value = local.aws_vpc_id
   }
+
+  depends_on = [var.alb_controller_depends_on]
 }
 
 resource "helm_release" "not_using_iamserviceaccount" {
@@ -429,5 +431,6 @@ resource "helm_release" "not_using_iamserviceaccount" {
     name  = "vpcId"
     value = local.aws_vpc_id
   }
+  depends_on = [var.alb_controller_depends_on]
 }
 
