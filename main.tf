@@ -288,6 +288,7 @@ resource "kubernetes_service_account" "this" {
     }
     labels = {
       "app.kubernetes.io/name"       = "aws-load-balancer-controller"
+      "app.kubernetes.io/component"  = "controller"
       "app.kubernetes.io/managed-by" = "terraform"
     }
   }
