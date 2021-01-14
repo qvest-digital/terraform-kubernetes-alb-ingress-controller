@@ -382,7 +382,7 @@ resource "helm_release" "using_iamserviceaccount" {
   repository = local.alb_controller_helm_repo
   chart      = local.alb_controller_chart_name
   version    = local.alb_controller_chart_version
-  namespace  = "kube-system"
+  namespace  = var.k8s_namespace
   atomic     = true
 
   set {
@@ -416,7 +416,7 @@ resource "helm_release" "not_using_iamserviceaccount" {
   repository = local.alb_controller_helm_repo
   chart      = local.alb_controller_chart_name
   version    = local.alb_controller_chart_version
-  namespace  = "kube-system"
+  namespace  = var.k8s_namespace
   atomic     = true
 
   set {
