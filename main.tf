@@ -390,7 +390,7 @@ resource "helm_release" "using_iamserviceaccount" {
   version    = local.alb_controller_chart_version
   namespace  = var.k8s_namespace
   atomic     = true
-
+  timeout    = 900
   set {
     name  = "clusterName"
     value = var.k8s_cluster_name
@@ -424,6 +424,7 @@ resource "helm_release" "not_using_iamserviceaccount" {
   version    = local.alb_controller_chart_version
   namespace  = var.k8s_namespace
   atomic     = true
+  timeout    = 900
 
   set {
     name  = "clusterName"
