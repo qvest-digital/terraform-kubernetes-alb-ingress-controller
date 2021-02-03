@@ -298,6 +298,7 @@ resource "kubernetes_service_account" "this" {
       "app.kubernetes.io/managed-by" = "terraform"
     }
   }
+  depends_on = [var.alb_controller_depends_on]
 }
 
 resource "kubernetes_cluster_role" "this" {
@@ -355,6 +356,7 @@ resource "kubernetes_cluster_role" "this" {
       "watch",
     ]
   }
+  depends_on = [var.alb_controller_depends_on]
 }
 
 resource "kubernetes_cluster_role_binding" "this" {
