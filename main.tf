@@ -1,11 +1,11 @@
 locals {
-  alb_controller_helm_repo    = "https://aws.github.io/eks-charts"
-  alb_controller_chart_name   = "aws-load-balancer-controller"
-  alb_controller_chart_version      = var.aws_load_balancer_controller_chart_version
-  aws_alb_ingress_class                   = "alb"
-  aws_vpc_id                              = data.aws_vpc.selected.id
-  aws_region_name                         = data.aws_region.current.name
-  aws_iam_path_prefix                     = var.aws_iam_path_prefix == "" ? null : var.aws_iam_path_prefix
+  alb_controller_helm_repo     = "https://aws.github.io/eks-charts"
+  alb_controller_chart_name    = "aws-load-balancer-controller"
+  alb_controller_chart_version = var.aws_load_balancer_controller_chart_version
+  aws_alb_ingress_class        = "alb"
+  aws_vpc_id                   = data.aws_vpc.selected.id
+  aws_region_name              = data.aws_region.current.name
+  aws_iam_path_prefix          = var.aws_iam_path_prefix == "" ? null : var.aws_iam_path_prefix
 }
 
 data "aws_vpc" "selected" {
@@ -82,7 +82,7 @@ resource "aws_iam_policy" "this" {
   # We use a heredoc for the policy JSON so that we can more easily diff and
   # copy/paste from upstream.
   # Source: `curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.1.0/docs/install/iam_policy.json`
-  policy      = <<POLICY
+  policy = <<POLICY
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -440,7 +440,7 @@ data "template_file" "kubeconfig" {
 # Since the kubernetes_provider cannot yet handle CRDs, we need to set any
 # supplied TargetGroupBinding using a null_resource.
 #
-# The method use below for securely specifying the kubeconfig to provisioners
+# The method used below for securely specifying the kubeconfig to provisioners
 # without spilling secrets into the logs comes from:
 # https://medium.com/citihub/a-more-secure-way-to-call-kubectl-from-terraform-1052adf37af8
 
@@ -451,7 +451,7 @@ resource "null_resource" "supply_target_group_arns" {
     environment = {
       KUBECONFIG = base64encode(data.template_file.kubeconfig.rendered)
     }
-    command     = <<EOF
+    command = <<EOF
 cat <<YAML | kubectl -n ${var.k8s_namespace} --kubeconfig <(echo $KUBECONFIG | base64 --decode) apply -f -
 apiVersion: elbv2.k8s.aws/v1beta1
 kind: TargetGroupBinding
