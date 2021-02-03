@@ -381,8 +381,7 @@ resource "kubernetes_cluster_role_binding" "this" {
   }
 }
 
-resource "helm_release" "using_iamserviceaccount" {
-  count = var.k8s_cluster_type == "eks" ? 1 : 0
+resource "helm_release" "alb_controller" {
 
   name       = "aws-load-balancer-controller"
   repository = local.alb_controller_helm_repo
@@ -397,11 +396,11 @@ resource "helm_release" "using_iamserviceaccount" {
   }
   set {
     name  = "serviceAccount.create"
-    value = "false"
+    value = (var.k8s_cluster_type != "eks")
   }
   set {
     name  = "serviceAccount.name"
-    value = "aws-load-balancer-controller"
+    value = (var.k8s_cluster_type == "eks") ? kubernetes_service_account.this.metadata[0].name : null
   }
   set {
     name  = "region"
@@ -412,32 +411,6 @@ resource "helm_release" "using_iamserviceaccount" {
     value = local.aws_vpc_id
   }
 
-  depends_on = [var.alb_controller_depends_on]
-}
-
-resource "helm_release" "not_using_iamserviceaccount" {
-  count = var.k8s_cluster_type == "vanilla" ? 1 : 0
-
-  name       = "aws-load-balancer-controller"
-  repository = local.alb_controller_helm_repo
-  chart      = local.alb_controller_chart_name
-  version    = local.alb_controller_chart_version
-  namespace  = var.k8s_namespace
-  atomic     = true
-  timeout    = 900
-
-  set {
-    name  = "clusterName"
-    value = var.k8s_cluster_name
-  }
-  set {
-    name  = "region"
-    value = local.aws_region_name
-  }
-  set {
-    name  = "vpcId"
-    value = local.aws_vpc_id
-  }
   depends_on = [var.alb_controller_depends_on]
 }
 
@@ -471,8 +444,8 @@ data "template_file" "kubeconfig" {
 # without spilling secrets into the logs comes from:
 # https://medium.com/citihub/a-more-secure-way-to-call-kubectl-from-terraform-1052adf37af8
 
-resource "null_resource" "supply_target_group_arns_no_iam" {
-  count = (var.alb_target_group_arns != "" && var.k8s_cluster_type == "vanilla") ? 1 : 0
+resource "null_resource" "supply_target_group_arns" {
+  count = (var.alb_target_group_arns != "") ? 1 : 0
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     environment = {
@@ -492,29 +465,5 @@ spec:
 YAML
 EOF
   }
-  depends_on = [ helm_release.not_using_iamserviceaccount ]
-}
-
-resource "null_resource" "supply_target_group_arns_iam" {
-  count = (var.alb_target_group_arns != "" && var.k8s_cluster_type == "eks") ? 1 : 0
-  provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-c"]
-    environment = {
-      KUBECONFIG = base64encode(data.template_file.kubeconfig.rendered)
-    }
-    command     = <<EOF
-cat <<YAML | kubectl -n ${var.k8s_namespace} --kubeconfig <(echo $KUBECONFIG | base64 --decode) apply -f -
-apiVersion: elbv2.k8s.aws/v1beta1
-kind: TargetGroupBinding
-metadata:
-  name:
-spec:
-  serviceRef:
-    name: awesome-service # route traffic to the awesome-service
-    port: 80
-  targetGroupARN: ${var.alb_target_group_arns}
-YAML
-EOF
-  }
-  depends_on = [ helm_release.using_iamserviceaccount ]
+  depends_on = [helm_release.alb_controller]
 }
