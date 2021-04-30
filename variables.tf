@@ -74,8 +74,8 @@ variable "alb_controller_depends_on" {
   description = "Resources that the module should wait for before starting the controller. For example if there is no node_group, 'aws_eks_fargate_profile.default'"
 }
 
-variable "alb_target_group_arns" {
+variable "target_groups" {
   description = "ARNs for existing load balancers that should be added via TargetGroupBindings. See https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.1/guide/targetgroupbinding/targetgroupbinding/ for details"
-  type        = string
-  default     = ""
+  type        = any
+  default     = []
 }
