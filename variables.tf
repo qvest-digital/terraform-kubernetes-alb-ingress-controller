@@ -65,9 +65,9 @@ variable "aws_tags" {
 }
 
 variable "aws_load_balancer_controller_chart_version" {
-  description = "The AWS Load Balancer Controller version to use. See https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases for available versions"
+  description = "The AWS Load Balancer Controller version to use. See https://github.com/aws/eks-charts/releases/ and https://github.com/kubernetes-sigs/aws-load-balancer-controller/releases for available versions"
   type        = string
-  default     = "1.1.1"
+  default     = "1.2.2"
 }
 
 variable "alb_controller_depends_on" {
@@ -75,7 +75,13 @@ variable "alb_controller_depends_on" {
 }
 
 variable "target_groups" {
-  description = "ARNs for existing load balancers that should be added via TargetGroupBindings. See https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.1/guide/targetgroupbinding/targetgroupbinding/ for details"
+  description = "Group Binding details for TargetGroupBindings. Expected object fields: name, backend_port, target_group_arn, target_type See https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.1/guide/targetgroupbinding/targetgroupbinding/ for details."
   type        = any
   default     = []
+}
+
+variable "enable_host_networking" {
+  description = "If true enable host networking. See https://github.com/aws/eks-charts/tree/master/stable/aws-load-balancer-controller#configuration for details."
+  type        = bool
+  default     = false
 }
