@@ -64,7 +64,7 @@ data "aws_iam_policy_document" "eks_oidc_assume_role" {
 }
 
 resource "aws_iam_role" "this" {
-  name        = "${var.aws_resource_name_prefix}${var.k8s_cluster_name}-aws-load-balancer-controller"
+  name        = substr("${var.aws_resource_name_prefix}${var.k8s_cluster_name}-aws-load-balancer-controller", 0, 64)
   description = "Permissions required by the Kubernetes AWS Load Balancer controller to do its job."
   path        = local.aws_iam_path_prefix
 
