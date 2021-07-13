@@ -32,12 +32,6 @@ data "aws_eks_cluster_auth" "selected" {
   depends_on = [var.alb_controller_depends_on]
 }
 
-# Authentication data for that cluster
-data "aws_eks_cluster_auth" "selected" {
-  count = var.k8s_cluster_type == "eks" ? 1 : 0
-  name  = var.k8s_cluster_name
-}
-
 data "aws_iam_policy_document" "ec2_assume_role" {
   count = var.k8s_cluster_type == "vanilla" ? 1 : 0
   statement {
