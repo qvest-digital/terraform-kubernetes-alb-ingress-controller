@@ -416,7 +416,6 @@ resource "helm_release" "alb_controller" {
   namespace  = var.k8s_namespace
   atomic     = true
   timeout    = 900
-
   dynamic "set" {
     for_each = {
       "clusterName"           = var.k8s_cluster_name
