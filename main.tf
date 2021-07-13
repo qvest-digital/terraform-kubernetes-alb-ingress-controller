@@ -32,6 +32,12 @@ data "aws_eks_cluster_auth" "selected" {
   depends_on = [var.alb_controller_depends_on]
 }
 
+# Authentication data for that cluster
+data "aws_eks_cluster_auth" "selected" {
+  count = var.k8s_cluster_type == "eks" ? 1 : 0
+  name  = var.k8s_cluster_name
+}
+
 data "aws_iam_policy_document" "ec2_assume_role" {
   count = var.k8s_cluster_type == "vanilla" ? 1 : 0
   statement {
@@ -66,7 +72,7 @@ data "aws_iam_policy_document" "eks_oidc_assume_role" {
 }
 
 resource "aws_iam_role" "this" {
-  name        = "${var.aws_resource_name_prefix}${var.k8s_cluster_name}-aws-load-balancer-controller"
+  name        = substr("${var.aws_resource_name_prefix}${var.k8s_cluster_name}-aws-load-balancer-controller", 0, 64)
   description = "Permissions required by the Kubernetes AWS Load Balancer controller to do its job."
   path        = local.aws_iam_path_prefix
 
