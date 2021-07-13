@@ -89,7 +89,6 @@ resource "aws_iam_policy" "this" {
   path        = local.aws_iam_path_prefix
   # We use a heredoc for the policy JSON so that we can more easily diff and
   # copy/paste from upstream.
-
   # Source: `curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.2.0/docs/install/iam_policy.json`
   policy = <<-POLICY
 {
