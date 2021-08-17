@@ -20,15 +20,15 @@ data "aws_caller_identity" "current" {}
 
 # The EKS cluster (if any) that represents the installation target.
 data "aws_eks_cluster" "selected" {
-  count = var.k8s_cluster_type == "eks" ? 1 : 0
-  name  = var.k8s_cluster_name
+  count      = var.k8s_cluster_type == "eks" ? 1 : 0
+  name       = var.k8s_cluster_name
   depends_on = [var.alb_controller_depends_on]
 }
 
 # Authentication data for that cluster
 data "aws_eks_cluster_auth" "selected" {
-  count = var.k8s_cluster_type == "eks" ? 1 : 0
-  name  = var.k8s_cluster_name
+  count      = var.k8s_cluster_type == "eks" ? 1 : 0
+  name       = var.k8s_cluster_name
   depends_on = [var.alb_controller_depends_on]
 }
 
@@ -479,6 +479,14 @@ resource "null_resource" "supply_target_group_arns" {
         targetType:  ${lookup(var.target_groups[count.index], "target_type", "instance")}
       YAML
     EOF
+  }
+  provisioner "local-exec" {
+    when        = destroy
+    interpreter = ["/bin/bash", "-c"]
+    environment = {
+      KUBECONFIG = base64encode(data.template_file.kubeconfig.rendered)
+    }
+    command = "kubectl delete -n ${var.k8s_namespace} TargetGroupBinding  ${lookup(var.target_groups[count.index], "name", "")}-tgb"
   }
   depends_on = [helm_release.alb_controller]
 }
