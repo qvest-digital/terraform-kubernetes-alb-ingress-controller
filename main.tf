@@ -415,13 +415,13 @@ resource "helm_release" "alb_controller" {
       "clusterName" : var.k8s_cluster_name,
       "serviceAccount" : {
         "create" : (var.k8s_cluster_type != "eks"),
-        "name":  (var.k8s_cluster_type == "eks") ? kubernetes_service_account.this.metadata[0].name : null
+        "name" : (var.k8s_cluster_type == "eks") ? kubernetes_service_account.this.metadata[0].name : null
       },
-      "region": local.aws_region_name,
-      "vpcId": local.aws_vpc_id
-      "hostNetwork":  var.enable_host_networking
-    })]
-  
+      "region" : local.aws_region_name,
+      "vpcId" : local.aws_vpc_id
+      "hostNetwork" : var.enable_host_networking
+  })]
+
   depends_on = [var.alb_controller_depends_on]
 }
 
@@ -454,15 +454,16 @@ data "template_file" "kubeconfig" {
 # The method used below for securely specifying the kubeconfig to provisioners
 # without spilling secrets into the logs comes from:
 # https://medium.com/citihub/a-more-secure-way-to-call-kubectl-from-terraform-1052adf37af8
-
+#
+# The method used below for referencing external resources in a destroy
+# provisioner via triggers comes from
+# https://github.com/hashicorp/terraform/issues/23679#issuecomment-886020367
 resource "null_resource" "supply_target_group_arns" {
   count = (length(var.target_groups) > 0) ? length(var.target_groups) : 0
-  provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-c"]
-    environment = {
-      KUBECONFIG = base64encode(data.template_file.kubeconfig.rendered)
-    }
-    command = <<-EOF
+
+  triggers = {
+    kubeconfig  = base64encode(data.template_file.kubeconfig.rendered)
+    cmd_create  = <<-EOF
       cat <<YAML | kubectl -n ${var.k8s_namespace} --kubeconfig <(echo $KUBECONFIG | base64 --decode) apply -f -
       apiVersion: elbv2.k8s.aws/v1beta1
       kind: TargetGroupBinding
@@ -476,14 +477,23 @@ resource "null_resource" "supply_target_group_arns" {
         targetType:  ${lookup(var.target_groups[count.index], "target_type", "instance")}
       YAML
     EOF
+    cmd_destroy = "kubectl -n ${var.k8s_namespace} --kubeconfig <(echo $KUBECONFIG | base64 --decode) delete TargetGroupBinding ${lookup(var.target_groups[count.index], "name", "")}-tgb"
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    environment = {
+      KUBECONFIG = self.triggers.kubeconfig
+    }
+    command = self.triggers.cmd_create
   }
   provisioner "local-exec" {
     when        = destroy
     interpreter = ["/bin/bash", "-c"]
     environment = {
-      KUBECONFIG = base64encode(data.template_file.kubeconfig.rendered)
+      KUBECONFIG = self.triggers.kubeconfig
     }
-    command = "kubectl -n ${var.k8s_namespace} --kubeconfig <(echo $KUBECONFIG | base64 --decode) delete TargetGroupBinding ${lookup(var.target_groups[count.index], "name", "")}-tgb"
+    command = self.triggers.cmd_destroy
   }
   depends_on = [helm_release.alb_controller]
 }
