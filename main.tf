@@ -486,7 +486,7 @@ resource "null_resource" "supply_target_group_arns" {
     environment = {
       KUBECONFIG = base64encode(data.template_file.kubeconfig.rendered)
     }
-    command = "kubectl delete -n ${var.k8s_namespace} TargetGroupBinding  ${lookup(var.target_groups[count.index], "name", "")}-tgb"
+    command = "kubectl -n ${var.k8s_namespace} --kubeconfig <(echo $KUBECONFIG | base64 --decode) delete TargetGroupBinding ${lookup(var.target_groups[count.index], "name", "")}-tgb"
   }
   depends_on = [helm_release.alb_controller]
 }
