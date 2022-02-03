@@ -85,3 +85,9 @@ variable "enable_host_networking" {
   type        = bool
   default     = false
 }
+
+variable "chart_env_overrides" {
+  description = "env values passed to the load balancer controller helm chart."
+  type        = map(any)
+  default     = {}
+}
