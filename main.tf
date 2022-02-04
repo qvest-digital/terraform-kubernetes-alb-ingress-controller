@@ -91,24 +91,12 @@ resource "aws_iam_policy" "this" {
     {
       "Effect": "Allow",
       "Action": [
-        "iam:CreateServiceLinkedRole"
-      ],
-      "Resource": "*",
-      "Condition": {
-        "StringEquals": {
-            "iam:AWSServiceName": "elasticloadbalancing.amazonaws.com"
-        }
-      }
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
+        "iam:CreateServiceLinkedRole",
         "ec2:DescribeAccountAttributes",
         "ec2:DescribeAddresses",
         "ec2:DescribeAvailabilityZones",
         "ec2:DescribeInternetGateways",
         "ec2:DescribeVpcs",
-        "ec2:DescribeVpcPeeringConnections",
         "ec2:DescribeSubnets",
         "ec2:DescribeSecurityGroups",
         "ec2:DescribeInstances",
@@ -191,8 +179,7 @@ resource "aws_iam_policy" "this" {
       "Resource": "arn:aws:ec2:*:*:security-group/*",
       "Condition": {
         "Null": {
-          "aws:RequestTag/elbv2.k8s.aws/cluster": "true",
-          "aws:ResourceTag/elbv2.k8s.aws/cluster": "false"
+          "aws:ResourceTag/ingress.k8s.aws/cluster": "false"
         }
       }
     },
@@ -237,7 +224,8 @@ resource "aws_iam_policy" "this" {
       "Effect": "Allow",
       "Action": [
         "elasticloadbalancing:AddTags",
-        "elasticloadbalancing:RemoveTags"
+        "elasticloadbalancing:RemoveTags",
+        "elasticloadbalancing:DeleteTargetGroup"
       ],
       "Resource": [
         "arn:aws:elasticloadbalancing:*:*:targetgroup/*/*",
@@ -246,8 +234,7 @@ resource "aws_iam_policy" "this" {
       ],
       "Condition": {
         "Null": {
-          "aws:RequestTag/elbv2.k8s.aws/cluster": "true",
-          "aws:ResourceTag/elbv2.k8s.aws/cluster": "false"
+          "aws:ResourceTag/ingress.k8s.aws/cluster": "false"
         }
       }
     },
