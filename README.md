@@ -14,6 +14,14 @@ It is required that an OpenID connect provider [has already been created](https:
 
 Just make sure that you set the variable `k8s_cluster_type` to `eks` type if running on EKS.
 
+Using the NLB functionality requires that you also install the AWS VPC CNI add-on, like this:
+```hcl
+resource "aws_eks_addon" "vpc-cni" {
+  cluster_name = "<my-k8s-cluster-id>"
+  addon_name   = "vpc-cni"
+}
+```
+
 ## Examples
 
 ### EKS deployment
