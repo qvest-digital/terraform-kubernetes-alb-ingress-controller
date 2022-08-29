@@ -69,3 +69,8 @@ variable "aws_alb_ingress_controller_version" {
   type        = string
   default     = "1.1.7"
 }
+
+variable "priority_class_name" {
+  type    = string
+  default = ""
+}

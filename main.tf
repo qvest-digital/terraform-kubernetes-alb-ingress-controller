@@ -393,6 +393,8 @@ resource "kubernetes_deployment" "this" {
 
         restart_policy = "Always"
 
+        priority_class_name  = var.priority_class_name
+
         container {
           name                     = "server"
           image                    = local.aws_alb_ingress_controller_docker_image
